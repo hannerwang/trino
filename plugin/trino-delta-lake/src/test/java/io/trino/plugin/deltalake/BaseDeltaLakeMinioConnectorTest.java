@@ -197,28 +197,6 @@ public abstract class BaseDeltaLakeMinioConnectorTest
         assertEquals(actualColumns, expectedColumns);
     }
 
-    @Test
-    @Override
-    public void testShowCreateTable()
-    {
-        assertThat((String) computeActual("SHOW CREATE TABLE orders").getOnlyValue())
-                .matches("CREATE TABLE \\w+\\.\\w+\\.orders \\Q(\n" +
-                        "   orderkey bigint,\n" +
-                        "   custkey bigint,\n" +
-                        "   orderstatus varchar,\n" +
-                        "   totalprice double,\n" +
-                        "   orderdate date,\n" +
-                        "   orderpriority varchar,\n" +
-                        "   clerk varchar,\n" +
-                        "   shippriority integer,\n" +
-                        "   comment varchar\n" +
-                        ")\n" +
-                        "WITH (\n" +
-                        "   location = \\E'.*/test_schema/orders',\n\\Q" +
-                        "   partitioned_by = ARRAY[]\n" +
-                        ")");
-    }
-
     // not pushdownable means not convertible to a tuple domain
     @Test
     public void testQueryNullPartitionWithNotPushdownablePredicate()

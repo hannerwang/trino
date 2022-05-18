@@ -13,11 +13,35 @@
  */
 package io.trino.plugin.deltalake;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 public class TestDeltaLakeOssDeltaLakeConnectorTest
         extends BaseDeltaLakeMinioConnectorTest
 {
     public TestDeltaLakeOssDeltaLakeConnectorTest()
     {
         super("ossdeltalake-test-queries", "io/trino/plugin/deltalake/testing/resources/ossdeltalake/");
+    }
+
+    @Override
+    public void testShowCreateTable()
+    {
+        // Table comment is different from TestDeltaLakeDatabricksConnectorTest
+        assertThat((String) computeActual("SHOW CREATE TABLE orders").getOnlyValue())
+                .isEqualTo("CREATE TABLE delta_lake.test_schema.orders (\n" +
+                        "   orderkey bigint,\n" +
+                        "   custkey bigint,\n" +
+                        "   orderstatus varchar,\n" +
+                        "   totalprice double,\n" +
+                        "   orderdate date,\n" +
+                        "   orderpriority varchar,\n" +
+                        "   clerk varchar,\n" +
+                        "   shippriority integer,\n" +
+                        "   comment varchar\n" +
+                        ")\n" +
+                        "WITH (\n" +
+                        "   location = 's3://ossdeltalake-test-queries/test_schema/orders',\n" +
+                        "   partitioned_by = ARRAY[]\n" +
+                        ")");
     }
 }

@@ -401,7 +401,7 @@ public class DeltaLakeMetadata
                 tableHandle.getSchemaTableName(),
                 columns,
                 properties.buildOrThrow(),
-                Optional.empty());
+                tableHandle.getComment());
     }
 
     @Override
@@ -622,7 +622,8 @@ public class DeltaLakeMetadata
                         CREATE_TABLE_OPERATION,
                         session,
                         nodeVersion,
-                        nodeId);
+                        nodeId,
+                        tableMetadata.getComment());
 
                 setRollback(() -> deleteRecursivelyIfExists(new HdfsContext(session), hdfsEnvironment, deltaLogDirectory));
                 transactionLogWriter.flush();
@@ -731,7 +732,8 @@ public class DeltaLakeMetadata
                 tableMetadata.getColumns().stream().map(column -> toColumnHandle(column, partitionedBy)).collect(toImmutableList()),
                 location,
                 DeltaLakeTableProperties.getCheckpointInterval(tableMetadata.getProperties()),
-                external);
+                external,
+                tableMetadata.getComment());
     }
 
     private Optional<String> getSchemaLocation(Database database)
@@ -873,7 +875,8 @@ public class DeltaLakeMetadata
                     CREATE_TABLE_AS_OPERATION,
                     session,
                     nodeVersion,
-                    nodeId);
+                    nodeId,
+                    handle.getComment());
             appendAddFileEntries(transactionLogWriter, dataFileInfos, handle.getPartitionedBy(), true);
             transactionLogWriter.flush();
             PrincipalPrivileges principalPrivileges = buildInitialPrivilegeSet(table.getOwner().orElseThrow());
@@ -904,7 +907,8 @@ public class DeltaLakeMetadata
             String operation,
             ConnectorSession session,
             String nodeVersion,
-            String nodeId)
+            String nodeId,
+            Optional<String> comment)
     {
         long createdTime = System.currentTimeMillis();
         transactionLogWriter.appendCommitInfoEntry(
@@ -928,7 +932,7 @@ public class DeltaLakeMetadata
                 new MetadataEntry(
                         randomUUID().toString(),
                         null,
-                        null,
+                        comment.orElse(null),
                         new Format("parquet", ImmutableMap.of()),
                         serializeSchemaAsJson(columns),
                         partitionColumnNames,
