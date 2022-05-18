@@ -77,6 +77,7 @@ import static io.trino.plugin.bigquery.BigQueryPseudoColumn.PARTITION_DATE;
 import static io.trino.plugin.bigquery.BigQueryPseudoColumn.PARTITION_TIME;
 import static io.trino.plugin.bigquery.BigQueryTableHandle.BigQueryPartitionType.INGESTION;
 import static io.trino.plugin.bigquery.BigQueryType.toField;
+import static io.trino.spi.StandardErrorCode.NOT_SUPPORTED;
 import static java.util.Locale.ENGLISH;
 import static java.util.Objects.requireNonNull;
 import static java.util.function.Function.identity;
@@ -391,6 +392,7 @@ public class BigQueryMetadata
         }
 
         List<Field> fields = tableMetadata.getColumns().stream()
+                .peek(column -> throwIfNotNull(column.getComment()))
                 .map(column -> toField(column.getName(), column.getType()))
                 .collect(toImmutableList());
 
@@ -501,5 +503,12 @@ public class BigQueryMetadata
                 return cursor.apply(constraint);
             }
         };
+    }
+
+    private static void throwIfNotNull(String comment)
+    {
+        if (comment != null) {
+            throw new TrinoException(NOT_SUPPORTED, "This connector does not support creating tables with column comment");
+        }
     }
 }
