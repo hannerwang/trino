@@ -13,8 +13,6 @@
  */
 package io.trino.tests.product.hive;
 
-import io.trino.tempto.AfterTestWithContext;
-import io.trino.tempto.BeforeTestWithContext;
 import io.trino.tempto.ProductTest;
 import io.trino.tempto.assertions.QueryAssert;
 import io.trino.tempto.query.QueryResult;
@@ -34,19 +32,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 public abstract class BaseTestSyncPartitionMetadata
         extends ProductTest
 {
-    @BeforeTestWithContext
-    public void setUp()
-    {
-        removeHdfsDirectory(schemaLocation());
-        makeHdfsDirectory(schemaLocation());
-    }
-
-    @AfterTestWithContext
-    public void tearDown()
-    {
-        removeHdfsDirectory(schemaLocation());
-    }
-
     public void testAddPartition()
     {
         String tableName = "test_sync_partition_metadata_add_partition";

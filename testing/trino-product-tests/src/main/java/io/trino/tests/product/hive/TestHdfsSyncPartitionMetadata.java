@@ -27,8 +27,6 @@ import static io.trino.tests.product.TestGroups.SMOKE;
 import static io.trino.tests.product.TestGroups.TRINO_JDBC;
 import static io.trino.tests.product.hive.HiveProductTest.ERROR_COMMITTING_WRITE_TO_HIVE_ISSUE;
 import static io.trino.tests.product.hive.HiveProductTest.ERROR_COMMITTING_WRITE_TO_HIVE_MATCH;
-import static io.trino.tests.product.hive.util.TemporaryHiveTable.randomTableSuffix;
-import static java.lang.String.format;
 
 public class TestHdfsSyncPartitionMetadata
         extends BaseTestSyncPartitionMetadata
@@ -41,12 +39,10 @@ public class TestHdfsSyncPartitionMetadata
     @Inject
     private HdfsDataSourceWriter hdfsDataSourceWriter;
 
-    private final String schema = "test_" + randomTableSuffix();
-
     @Override
     protected String schemaLocation()
     {
-        return format("%s/%s", warehouseDirectory, schema);
+        return warehouseDirectory;
     }
 
     @Test(groups = {HIVE_PARTITIONING, SMOKE, TRINO_JDBC})
